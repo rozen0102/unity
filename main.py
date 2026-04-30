@@ -29,6 +29,7 @@ DIFY_API_KEY = os.getenv('DIFY_API_KEY')
 class ChatRequest(BaseModel):
     message: str
     user_id: str = "web_user"
+    role_name: str = "郭小美"  # 【新增】接收 Unity 傳來的角色名稱，預設為郭小美
 
 # 將路由從 /webhook 改為 /api/chat
 @app.post("/api/chat")
@@ -38,6 +39,7 @@ async def chat_with_dify(request: ChatRequest):
 
     user_message = request.message
     user_id = request.user_id
+    role_name = request.role_name  # 【新增】取出角色名稱
 
     try:
         # 呼叫 Dify 大腦 (Streaming 模式)
@@ -45,7 +47,9 @@ async def chat_with_dify(request: ChatRequest):
             "https://api.dify.ai/v1/chat-messages",
             headers={"Authorization": f"Bearer {DIFY_API_KEY}"},
             json={
-                "inputs": {},
+                "inputs": {
+                    "character_name": role_name  # 【修改】將角色名稱傳遞給 Dify 作為變數
+                },
                 "query": user_message,
                 "response_mode": "streaming", # Agent 必須使用串流模式
                 "user": user_id
@@ -77,7 +81,7 @@ async def chat_with_dify(request: ChatRequest):
                         pass
                         
         if not answer:
-            answer = "Dify 處理完畢，但未產生文字回應 (可能只回傳了思考過程，請檢查 Agent 設定)。"
+            answer = "Dify 處理完畢，但未產生文字回應 (可能只回傳了思考過程，請檢查 Agent 提示詞設定)。"
             
         # 直接把純文字 (Markdown格式) 丟回給前端網頁
         return {"reply": answer}
