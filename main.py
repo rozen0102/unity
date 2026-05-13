@@ -29,7 +29,7 @@ DIFY_API_KEY = os.getenv('DIFY_API_KEY')
 class ChatRequest(BaseModel):
     message: str
     user_id: str = "web_user"
-    role_name: str = "郭小美"  # 【新增】接收 Unity 傳來的角色名稱，預設為郭小美
+    role_name: str = "小亞"  # 【新增】接收 Unity 傳來的角色名稱，預設為小亞
 
 # 將路由從 /webhook 改為 /api/chat
 @app.post("/api/chat")
